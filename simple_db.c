@@ -39,6 +39,16 @@ void read_input(InputBuffer *input_buffer) {
     input_buffer->buffer[bytes_read - 1] = '\0';
 }
 
+typedef enum {
+    META_COMMAND_SUCCESS,
+    META_COMMAND_UNRECOGNIZED_COMMAND
+} MetaCommandResult;
+
+typedef enum {
+    PREPARE_SUCCESS,
+    PREPARE_UNRECOGNIZED_COMMAND
+} PrepareResult;
+
 int main(int argc, char *argv[]) {
     InputBuffer *input_buffer = new_input_buffer();
 
