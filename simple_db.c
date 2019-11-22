@@ -70,6 +70,17 @@ PrepareResult prepare_statement(InputBuffer *input_buffer, Statement *statement)
     return PREPARE_UNRECOGNIZED_COMMAND;
 }
 
+void execute_statement(Statement *statement) {
+    switch (statement->type) {
+        case (STATEMENT_INSERT):
+            printf("This is where we would do an insert. \n");
+            break;
+        case (STATEMENT_SELECT):
+            printf("This is where we would do a select. \n");
+            break;
+    }
+}
+
 MetaCommandResult do_meta_command(InputBuffer *input_buffer) {
     if (strcmp(input_buffer->buffer, ".exit") == 0) {
         close_input_buffer(input_buffer);
