@@ -46,7 +46,7 @@ typedef enum {
 
 typedef enum {
     PREPARE_SUCCESS,
-    PREPARE_UNRECOGNIZED_COMMAND
+    PREPARE_UNRECOGNIZED_STATEMENT
 } PrepareResult;
 
 typedef enum {
@@ -67,7 +67,7 @@ PrepareResult prepare_statement(InputBuffer *input_buffer, Statement *statement)
         statement->type = STATEMENT_SELECT;
         return PREPARE_SUCCESS;
     }
-    return PREPARE_UNRECOGNIZED_COMMAND;
+    return PREPARE_UNRECOGNIZED_STATEMENT;
 }
 
 void execute_statement(Statement *statement) {
@@ -106,5 +106,18 @@ int main(int argc, char *argv[]) {
                    continue;
            }
         }
+
+        Statement statement;
+        switch (prepare_statement(input_buffer, &statement)) {
+            case (PREPARE_SUCCESS):
+                break;
+            case (PREPARE_UNRECOGNIZED_STATEMENT):
+                printf("Unrecognized keyword at start of '%s'. \n",
+                        input_buffer->buffer);
+                continue;
+        }
+
+        execute_statement(&statement);
+        printf("Executed. \n");
     }
 }
