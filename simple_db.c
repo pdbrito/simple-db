@@ -12,6 +12,8 @@ typedef struct {
     char email[COLUMN_EMAIL_SIZE];
 } Row;
 
+#define size_of_attribute(Struct, Attribute) sizeof(((Struct*)0)->Attribute)
+
 typedef struct {
     char *buffer;
     size_t buffer_length;
