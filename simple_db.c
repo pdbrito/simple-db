@@ -22,6 +22,12 @@ const uint32_t USERNAME_OFFSET = ID_OFFSET + ID_SIZE;
 const uint32_t EMAIL_OFFSET = USERNAME_OFFSET + USERNAME_SIZE;
 const uint32_t ROW_SIZE = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE;
 
+void serialize_row(Row *source, void *destination) {
+    memcpy(destination + ID_OFFSET, &(source->id), ID_SIZE);
+    memcpy(destination + USERNAME_OFFSET, &(source->username), USERNAME_SIZE);
+    memcpy(destination + EMAIL_OFFSET, &(source->email), EMAIL_SIZE);
+}
+
 
 typedef struct {
     char *buffer;
