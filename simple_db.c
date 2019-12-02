@@ -152,6 +152,18 @@ ExecuteResult execute_insert(Statement *statement, Table *table) {
     return EXECUTE_SUCCESS;
 }
 
+void print_row(Row *row) {
+    printf("(%d, %s, %s)\n", row->id, row->username, row->email);
+}
+
+ExecuteResult execute_select(Statement *statement, Table *table) {
+    Row row;
+    for (uint32_t i = 0; i < table->num_rows; i++) {
+        deserialize_row(row_slot(table, i), &row);
+        print_row(&row);
+    }
+    return EXECUTE_SUCCESS;
+}
     switch (statement->type) {
         case (STATEMENT_INSERT):
             printf("This is where we would do an insert. \n");
