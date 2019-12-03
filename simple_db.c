@@ -223,7 +223,13 @@ int main(int argc, char *argv[]) {
                 continue;
         }
 
-        execute_statement(&statement);
-        printf("Executed. \n");
+        switch (execute_statement(&statement, table)) {
+            case (EXECUTE_SUCCESS):
+                printf("Executed.\n");
+                break;
+            case (EXECUTE_TABLE_FULL):
+                printf("Error: Table full. \n");
+                break;
+        }
     }
 }
