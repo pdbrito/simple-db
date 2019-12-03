@@ -183,6 +183,15 @@ MetaCommandResult do_meta_command(InputBuffer *input_buffer) {
     }
 }
 
+Table *new_table() {
+    Table* table = malloc(sizeof(Table));
+    table->num_rows = 0;
+    for (uint32_t i = 0; i < TABLE_MAX_PAGES; i++) {
+        table->pages[i] = NULL;
+    }
+    return table;
+}
+
 int main(int argc, char *argv[]) {
     InputBuffer *input_buffer = new_input_buffer();
 
