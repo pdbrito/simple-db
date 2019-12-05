@@ -26,4 +26,13 @@ describe 'database' do
             "db > ",
         ])
     end
+
+    it 'prints error message when table is full' do
+        script = (1..1401).map do |i|
+            "insert #{i} user#{i} person#{i}@exmaple.com"
+        end
+        script << ".exit"
+        result = run_script(script)
+        expect(result[-2]).to eq('db > Error: Table full.')
+     end
 end
