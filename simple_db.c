@@ -228,7 +228,7 @@ int main(int argc, char *argv[]) {
                 printf("Executed.\n");
                 break;
             case (EXECUTE_TABLE_FULL):
-                printf("Error: Table full. \n");
+                printf("Error: Table full.\n");
                 break;
         }
     }
