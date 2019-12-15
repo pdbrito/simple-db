@@ -234,6 +234,28 @@ ExecuteResult execute_statement(Statement *statement, Table *table) {
     }
 }
 
+void pager_flush(Pager *pager, uint32_t page_num, uint32_t size) {
+    if (pager->pages[page_num] == NULL) {
+        printf("Tried to flush null page\n");
+        exit(EXIT_FAILURE);
+    }
+
+    off_t offset = lseek(pager->file_descriptor, page_num * PAGE_SIZE, SEEK_SET);
+
+    if (offset == -1) {
+        printf("Error seeking: %d\n", errno);
+        exit(EXIT_FAILURE);
+    }
+
+    ssize_t bytes_written =
+            write(pager->file_descriptor, pager->pages[page_num], size);
+
+    if (bytes_written == -1) {
+        printf("Error writing: %d\n", errno);
+        exit(EXIT_FAILURE);
+    }
+}
+
 void db_close(Table *table) {
     Pager *pager = table->pager;
     uint32_t num_full_pages = table->num_rows / ROWS_PER_PAGE;
