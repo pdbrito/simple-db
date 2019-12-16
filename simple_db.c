@@ -337,7 +337,13 @@ Table *db_open(const char* filename) {
 }
 
 int main(int argc, char *argv[]) {
-    Table* table = db_open();
+    if (argc < 2) {
+        printf("Must supply a database filename.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char *filename = argv[1];
+    Table* table = db_open(filename);
     InputBuffer *input_buffer = new_input_buffer();
 
     while (true) {
@@ -345,7 +351,7 @@ int main(int argc, char *argv[]) {
         read_input(input_buffer);
 
         if (input_buffer->buffer[0] == '.') {
-           switch (do_meta_command(input_buffer)) {
+           switch (do_meta_command(input_buffer, table)) {
                case META_COMMAND_SUCCESS:
                    continue;
                case META_COMMAND_UNRECOGNIZED_COMMAND:
