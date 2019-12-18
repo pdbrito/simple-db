@@ -90,6 +90,15 @@ void *get_page(Pager *pager, uint32_t page_num) {
     return pager->pages[page_num];
 }
 
+Cursor *table_start(Table *table) {
+    Cursor *cursor = malloc(sizeof(Cursor));
+    cursor->table = table;
+    cursor->row_num = 0;
+    cursor->end_of_table = (table->num_rows == 0);
+
+    return cursor;
+}
+
 void *row_slot(Table *table, uint32_t row_num) {
     uint32_t page_num = row_num / ROWS_PER_PAGE;
     void *page = get_page(table->pager, page_num);
