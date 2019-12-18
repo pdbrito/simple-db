@@ -117,6 +117,13 @@ void *cursor_value(Cursor *cursor) {
     return page + byte_offset;
 }
 
+void cursor_advance(Cursor *cursor) {
+    cursor->row_num += 1;
+    if (cursor->row_num >= cursor->table->num_rows) {
+        cursor->end_of_table = true;
+    }
+}
+
 typedef struct {
     char *buffer;
     size_t buffer_length;
