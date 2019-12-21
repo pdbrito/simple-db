@@ -59,6 +59,8 @@ typedef struct {
     bool end_of_table; //Indicates a position one past the last element
 } Cursor;
 
+typedef enum { NODE_INTERNAL, NODE_LEAF } NodeType;
+
 void *get_page(Pager *pager, uint32_t page_num) {
     if (page_num > TABLE_MAX_PAGES) {
         printf("Tried to fetch page number out of bounds. %d > %d\n",
