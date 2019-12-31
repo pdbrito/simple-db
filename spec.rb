@@ -1,7 +1,11 @@
 describe 'database' do
+    before do
+        `rm -rf test.db`
+    end
+
     def run_script(commands)
         raw_output = nil
-        IO.popen("./cmake-build-debug/simpledb", "r+") do |pipe|
+        IO.popen("./cmake-build-debug/simpledb test.db", "r+") do |pipe|
             commands.each do |command|
                 pipe.puts command
             end
