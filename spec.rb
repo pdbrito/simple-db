@@ -40,7 +40,7 @@ describe 'database' do
         expect(result[-2]).to eq('db > Error: Table full.')
      end
 
-     it 'allows inserting strings that are the maximum length' do
+    it 'allows inserting strings that are the maximum length' do
         long_username = "a"*32
         long_email = "a"*253
         script = [
@@ -57,7 +57,7 @@ describe 'database' do
         ])
      end
 
-     it 'prints error message if strings are too long' do
+    it 'prints error message if strings are too long' do
         long_username = "a"*33
         long_email = "a"*256
         script = [
@@ -73,7 +73,7 @@ describe 'database' do
         ])
      end
 
-     it 'prints an error message if id is negative' do
+    it 'prints an error message if id is negative' do
         script = [
             "insert -1 user user@mail.com",
             "select",
@@ -87,7 +87,7 @@ describe 'database' do
         ])
      end
 
-     it 'keeps data after closing connection' do
+    it 'keeps data after closing connection' do
         result1 = run_script([
             "insert 1 user user@mail.com",
             ".exit",
