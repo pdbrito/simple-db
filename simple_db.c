@@ -354,6 +354,34 @@ const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + 1) / 2;
 const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT =
         (LEAF_NODE_MAX_CELLS + 1) - LEAF_NODE_RIGHT_SPLIT_COUNT;
 
+void create_new_root(Table *table,uint32_t right_child_page_num) {
+    /*
+     * Handle splitting the root.
+     * Old root copied to new page, becomes left child.
+     * Address of right child passed in.
+     * Re-initialize root page to contain the new root node.
+     * New root node points to two children
+     */
+
+    void *root = get_page(table->pager, table->root_page_num);
+    void *right_child = get_page(table->pager, right_child_page_num);
+    uint32_t left_child_page_num = get_unused_page_num(table->pager);
+    void *left_child = get_page(table->pager, left_child_page_num);
+
+    /* Left child has data copied from old root */
+    memcpy(left_child, root, PAGE_SIZE);
+    set_node_root(left_child, false);
+
+    /* Root node is a new internal node with one key and two children */
+    initialize_internal_node(root);
+    set_node_root(root, true);
+    *internal_node_num_keys(root) = 1;
+    *internal_node_child(root, 0) = left_child_page_num;
+    uint32_t left_child_max_key = get_node_max_key(left_child);
+    *internal_node_key(root, 0) = left_child_max_key;
+    *internal_node_right_child(root) = right_child_page_num;
+}
+
 void leaf_node_split_and_insert(Cursor *cursor, uint32_t key, Row *value) {
     /*
      * Create a new node and move half the cells over.
