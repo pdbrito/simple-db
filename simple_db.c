@@ -366,6 +366,14 @@ const uint32_t INTERNAL_NODE_HEADER_SIZE =
         COMMON_NODE_HEADER_SIZE + INTERNAL_NODE_NUM_KEYS_SIZE +
         INTERNAL_NODE_RIGHT_CHILD_SIZE;
 
+/*
+ * Internal Node Body Layout
+ */
+const uint32_t INTERNAL_NODE_KEY_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_CHILD_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_CELL_SIZE =
+        INTERNAL_NODE_CHILD_SIZE + INTERNAL_NODE_KEY_SIZE;
+
 void create_new_root(Table *table,uint32_t right_child_page_num) {
     /*
      * Handle splitting the root.
