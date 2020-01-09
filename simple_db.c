@@ -116,6 +116,16 @@ void set_node_type(void *node, NodeType type) {
     *((uint8_t*)(node + NODE_TYPE_OFFSET)) = value;
 }
 
+bool is_node_root(void *node) {
+    uint8_t value = *((uint8_t*)(node + IS_ROOT_OFFSET));
+    return (bool)value;
+}
+
+void set_node_root(void *node, bool is_root) {
+    uint8_t value = is_root;
+    *((uint8_t*)(node + IS_ROOT_OFFSET)) = value;
+}
+
 void initialize_leaf_node(void *node) {
     set_node_type(node, NODE_LEAF);
     *leaf_node_num_cells(node) = 0;
