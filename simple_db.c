@@ -74,6 +74,12 @@ const uint32_t PARENT_POINTER_OFFSET = IS_ROOT_OFFSET + IS_ROOT_SIZE;
 const uint8_t COMMON_NODE_HEADER_SIZE =
         NODE_TYPE_SIZE + IS_ROOT_SIZE + PARENT_POINTER_SIZE;
 
+
+NodeType get_node_type(void *node) {
+    uint8_t value = *((uint8_t*)(node + NODE_TYPE_OFFSET));
+    return (NodeType)value;
+}
+
 /*
  * Leaf Node Header Layout
  */
@@ -245,11 +251,6 @@ Cursor *table_start(Table *table) {
     cursor->end_of_table = (num_cells == 0);
 
     return cursor;
-}
-
-NodeType get_node_type(void *node) {
-    uint8_t value = *((uint8_t*)(node + NODE_TYPE_OFFSET));
-    return (NodeType)value;
 }
 
 Cursor *leaf_node_find(Table *table, uint32_t page_num, uint32_t key) {
