@@ -132,6 +132,73 @@ void initialize_leaf_node(void *node) {
     *leaf_node_num_cells(node) = 0;
 }
 
+const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + 1) / 2;
+const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT =
+        (LEAF_NODE_MAX_CELLS + 1) - LEAF_NODE_RIGHT_SPLIT_COUNT;
+
+/*
+ * Internal Node Header Layout
+ */
+const uint32_t INTERNAL_NODE_NUM_KEYS_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET = COMMON_NODE_HEADER_SIZE;
+const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET =
+        INTERNAL_NODE_NUM_KEYS_OFFSET + INTERNAL_NODE_NUM_KEYS_SIZE;
+const uint32_t INTERNAL_NODE_HEADER_SIZE =
+        COMMON_NODE_HEADER_SIZE + INTERNAL_NODE_NUM_KEYS_SIZE +
+        INTERNAL_NODE_RIGHT_CHILD_SIZE;
+
+/*
+ * Internal Node Body Layout
+ */
+const uint32_t INTERNAL_NODE_KEY_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_CHILD_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_CELL_SIZE =
+        INTERNAL_NODE_CHILD_SIZE + INTERNAL_NODE_KEY_SIZE;
+
+uint32_t *internal_node_num_keys(void *node) {
+    return node + INTERNAL_NODE_NUM_KEYS_OFFSET;
+}
+
+uint32_t *internal_node_right_child(void *node) {
+    return node + INTERNAL_NODE_RIGHT_CHILD_OFFSET;
+}
+
+uint32_t *internal_node_cell(void *node, uint32_t cell_num) {
+    return node + INTERNAL_NODE_HEADER_SIZE + cell_num * INTERNAL_NODE_CELL_SIZE;
+}
+
+uint32_t *internal_node_child(void *node, uint32_t child_num) {
+    uint32_t num_keys = *internal_node_num_keys(node);
+    if (child_num > num_keys) {
+        printf("Tried to access child_num %d > num keys %d\n", child_num, num_keys);
+        exit(EXIT_FAILURE);
+    } else if (child_num == num_keys) {
+        return internal_node_right_child(node);
+    } else {
+        return internal_node_cell(node, child_num);
+    }
+}
+
+uint32_t *internal_node_key(void* node, uint32_t key_num) {
+    return internal_node_cell(node, key_num) + INTERNAL_NODE_CHILD_SIZE;
+}
+
+void initialize_internal_node(void *node) {
+    set_node_type(node, NODE_INTERNAL);
+    set_node_root(node, false);
+    *internal_node_num_keys(node) = 0;
+}
+
+uint32_t get_node_max_key(void *node) {
+    switch (get_node_type(node)) {
+        case NODE_INTERNAL:
+            return *internal_node_key(node, *internal_node_num_keys(node) - 1);
+        case NODE_LEAF:
+            return *leaf_node_key(node, *leaf_node_num_cells(node) - 1);
+    }
+}
+
 void *get_page(Pager *pager, uint32_t page_num) {
     if (page_num > TABLE_MAX_PAGES) {
         printf("Tried to fetch page number out of bounds. %d > %d\n",
@@ -360,73 +427,6 @@ typedef enum {
  * go onto the end of the database file
  */
 uint32_t get_unused_page_num(Pager *pager) { return pager->num_pages;}
-
-const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + 1) / 2;
-const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT =
-        (LEAF_NODE_MAX_CELLS + 1) - LEAF_NODE_RIGHT_SPLIT_COUNT;
-
-/*
- * Internal Node Header Layout
- */
-const uint32_t INTERNAL_NODE_NUM_KEYS_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET = COMMON_NODE_HEADER_SIZE;
-const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET =
-        INTERNAL_NODE_NUM_KEYS_OFFSET + INTERNAL_NODE_NUM_KEYS_SIZE;
-const uint32_t INTERNAL_NODE_HEADER_SIZE =
-        COMMON_NODE_HEADER_SIZE + INTERNAL_NODE_NUM_KEYS_SIZE +
-        INTERNAL_NODE_RIGHT_CHILD_SIZE;
-
-/*
- * Internal Node Body Layout
- */
-const uint32_t INTERNAL_NODE_KEY_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_CHILD_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_CELL_SIZE =
-        INTERNAL_NODE_CHILD_SIZE + INTERNAL_NODE_KEY_SIZE;
-
-uint32_t *internal_node_num_keys(void *node) {
-    return node + INTERNAL_NODE_NUM_KEYS_OFFSET;
-}
-
-uint32_t *internal_node_right_child(void *node) {
-    return node + INTERNAL_NODE_RIGHT_CHILD_OFFSET;
-}
-
-uint32_t *internal_node_cell(void *node, uint32_t cell_num) {
-    return node + INTERNAL_NODE_HEADER_SIZE + cell_num * INTERNAL_NODE_CELL_SIZE;
-}
-
-uint32_t *internal_node_child(void *node, uint32_t child_num) {
-    uint32_t num_keys = *internal_node_num_keys(node);
-    if (child_num > num_keys) {
-        printf("Tried to access child_num %d > num keys %d\n", child_num, num_keys);
-        exit(EXIT_FAILURE);
-    } else if (child_num == num_keys) {
-        return internal_node_right_child(node);
-    } else {
-        return internal_node_cell(node, child_num);
-    }
-}
-
-uint32_t *internal_node_key(void* node, uint32_t key_num) {
-    return internal_node_cell(node, key_num) + INTERNAL_NODE_CHILD_SIZE;
-}
-
-void initialize_internal_node(void *node) {
-    set_node_type(node, NODE_INTERNAL);
-    set_node_root(node, false);
-    *internal_node_num_keys(node) = 0;
-}
-
-uint32_t get_node_max_key(void *node) {
-    switch (get_node_type(node)) {
-        case NODE_INTERNAL:
-            return *internal_node_key(node, *internal_node_num_keys(node) - 1);
-        case NODE_LEAF:
-            return *leaf_node_key(node, *leaf_node_num_cells(node) - 1);
-    }
-}
 
 void create_new_root(Table *table,uint32_t right_child_page_num) {
     /*
