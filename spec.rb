@@ -193,7 +193,8 @@ describe 'database' do
             "    - 12",
             "    - 13",
             "    - 14",
-            "db > Need to implement searching an internal node",
+            "db > Executed.",
+            "db > ",
         ])
     end
 end
