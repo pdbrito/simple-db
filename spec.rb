@@ -7,7 +7,11 @@ describe 'database' do
         raw_output = nil
         IO.popen("./cmake-build-debug/simpledb test.db", "r+") do |pipe|
             commands.each do |command|
-                pipe.puts command
+                begin
+                    pipe.puts command
+                rescue Errno::EPIPE
+                    break
+                end
             end
 
             pipe.close_write
