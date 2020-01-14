@@ -120,6 +120,10 @@ void *leaf_node_value(void *node, uint32_t cell_num) {
     return leaf_node_cell(node, cell_num) + LEAF_NODE_KEY_SIZE;
 }
 
+uint32_t *leaf_node_next_leaf(void *node) {
+    return node + LEAF_NODE_NEXT_LEAF_OFFSET;
+}
+
 void set_node_type(void *node, NodeType type) {
     uint8_t value = type;
     *((uint8_t*)(node + NODE_TYPE_OFFSET)) = value;
