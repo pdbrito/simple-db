@@ -499,6 +499,8 @@ void leaf_node_split_and_insert(Cursor *cursor, uint32_t key, Row *value) {
     uint32_t new_page_num = get_unused_page_num(cursor->table->pager);
     void *new_node = get_page(cursor->table->pager, new_page_num);
     initialize_leaf_node(new_node);
+    *leaf_node_next_leaf(new_node) = *leaf_node_next_leaf(old_node);
+    *leaf_node_next_leaf(old_node) = new_page_num;
 
     /**
      * All existing keys plus new key should be divided evenly
