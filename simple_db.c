@@ -139,6 +139,8 @@ void set_node_root(void *node, bool is_root) {
     *((uint8_t*)(node + IS_ROOT_OFFSET)) = value;
 }
 
+uint32_t* node_parent(void *node) {return node + PARENT_POINTER_OFFSET;}
+
 void initialize_leaf_node(void *node) {
     set_node_type(node, NODE_LEAF);
     set_node_root(node, false);
