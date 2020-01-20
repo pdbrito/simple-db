@@ -163,6 +163,7 @@ const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET =
 const uint32_t INTERNAL_NODE_HEADER_SIZE =
         COMMON_NODE_HEADER_SIZE + INTERNAL_NODE_NUM_KEYS_SIZE +
         INTERNAL_NODE_RIGHT_CHILD_SIZE;
+const uint32_t INTERNAL_NODE_MAX_CELLS = 3;
 
 /*
  * Internal Node Body Layout
@@ -514,6 +515,25 @@ void create_new_root(Table *table,uint32_t right_child_page_num) {
 void update_internal_node_key(void *node, uint32_t old_key, uint32_t new_key) {
     uint32_t old_child_index = internal_node_find_child(node, old_key);
     *internal_node_key(node, old_child_index) = new_key;
+}
+
+void internal_node_insert(Table *table, uint32_t parent_page_num,
+                                        uint32_t child_page_num) {
+    /*
+     * Add a new child/key pair to parent that corresponds to child
+     */
+    void *parent = get_page(table->pager, parent_page_num);
+    void *child = get_page(table->pager, child_page_num);
+    uint32_t child_max_key = get_node_max_key(child);
+    uint32_t index = internal_node_find_child(parent, child_max_key);
+
+    uint32_t original_num_keys = *internal_node_num_keys(parent);
+    *internal_node_num_keys(parent) = original_num_keys + 1;
+
+    if (original_num_keys >= INTERNAL_NODE_MAX_CELLS) {
+        printf("Need to implement splitting internal node \n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void leaf_node_split_and_insert(Cursor *cursor, uint32_t key, Row *value) {
