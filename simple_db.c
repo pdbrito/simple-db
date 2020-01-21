@@ -534,6 +534,25 @@ void internal_node_insert(Table *table, uint32_t parent_page_num,
         printf("Need to implement splitting internal node \n");
         exit(EXIT_FAILURE);
     }
+
+    uint32_t right_child_page_num = *internal_node_right_child(parent);
+    void *right_child = get_page(table->pager, right_child_page_num);
+
+    if(child_max_key > get_node_max_key(right_child)) {
+        /* Replace right child */
+        *internal_node_child(parent, original_num_keys) = right_child_page_num;
+        *internal_node_key(parent, original_num_keys) = get_node_max_key(right_child);
+        *internal_node_right_child(parent) = child_page_num;
+    } else {
+        /* Make room for the new cell */
+        for (uint32_t i = original_num_keys; i > index; i--) {
+            void *destination = internal_node_cell(parent, i);
+            void *source = internal_node_cell(parent, i - 1);
+            memcpy(destination, source, INTERNAL_NODE_CELL_SIZE);
+        }
+        *internal_node_child(parent, index) = child_page_num;
+        *internal_node_key(parent, index) = child_max_key;
+    }
 }
 
 void leaf_node_split_and_insert(Cursor *cursor, uint32_t key, Row *value) {
